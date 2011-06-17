@@ -8,7 +8,8 @@ module MSDynamics
     'wsu' => 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd',
     'wsse'=> 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd',
     's'   => 'http://www.w3.org/2003/05/soap-envelope',
-    'psf' => 'http://schemas.microsoft.com/Passport/SoapServices/SOAPFault'
+    'psf' => 'http://schemas.microsoft.com/Passport/SoapServices/SOAPFault',
+    'cws' => 'http://schemas.microsoft.com/crm/2007/WebServices'
   }    
 
   class SoapService
@@ -31,7 +32,9 @@ module MSDynamics
            xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" 
            xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" 
            xmlns:wsa=\"http://www.w3.org/2005/08/addressing\" 
-           xmlns:wst=\"http://schemas.xmlsoap.org/ws/2005/02/trust\">
+           xmlns:wst=\"http://schemas.xmlsoap.org/ws/2005/02/trust\"
+           xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" 
+           xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">
            #{hdr}
            #{bdy}
          </s:Envelope>"        

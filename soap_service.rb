@@ -9,7 +9,8 @@ module MSDynamics
     'wsse'=> 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd',
     's'   => 'http://www.w3.org/2003/05/soap-envelope',
     'psf' => 'http://schemas.microsoft.com/Passport/SoapServices/SOAPFault',
-    'cws' => 'http://schemas.microsoft.com/crm/2007/WebServices'
+    'cws6' => 'http://schemas.microsoft.com/crm/2006/WebServices',
+    'cws7' => 'http://schemas.microsoft.com/crm/2007/WebServices'
   }    
 
   class SoapService

@@ -20,33 +20,62 @@ module MSDynamics
     end
     
     def retrieve(entity_name,entity_id,attributes)
-      columns = attributes.collect { |attrib| "<q1:Attribute>#{attrib}</q1:Attribute>" }
       message = SoapService.compose_message(@message_header,
         "<Retrieve xmlns='http://schemas.microsoft.com/crm/2007/WebServices'>
           <entityName>#{entity_name}</entityName>
           <id>#{entity_id}</id>
           <columnSet xmlns:q1='http://schemas.microsoft.com/crm/2006/Query' xsi:type='q1:ColumnSet'>
             <q1:Attributes> 
-              #{columns.to_s} 
+              #{get_columns(attributes)} 
             </q1:Attributes> 
           </columnSet> 
         </Retrieve>")
-      SoapService.send_request(@crm_service_url,message,get_action('Retrieve'))
+      doc = SoapService.send_request(@crm_service_url,message,get_action('Retrieve'))
+      res = {}
+      attributes.each do |attribute|
+        res.merge!(attribute => MSDynamics::SoapService.select_node_text(doc,"cws7:#{attribute}"))
+      end
+      res
     end
+        
+    def retrieve_multiple(entity_name, attributes, distinct=true, criteria_xml="")
+      message = SoapService.compose_message(@message_header,
+        "<RetrieveMultiple xmlns='http://schemas.microsoft.com/crm/2007/WebServices'>
+          <query xmlns:q1='http://schemas.microsoft.com/crm/2006/Query' xsi:type='q1:QueryExpression'>
+            <q1:EntityName>#{entity_name}</q1:EntityName>
+            <q1:ColumnSet xsi:type='q1:ColumnSet'>
+              <q1:Attributes>
+                #{get_columns(attributes)} 
+              </q1:Attributes>
+            </q1:ColumnSet>
+            <q1:Distinct>#{distinct.to_s}</q1:Distinct>
+            #{criteria_xml}
+          </query>
+        </RetrieveMultiple>")      
+      doc = SoapService.send_request(@crm_service_url,message,get_action('RetrieveMultiple'))
+      business_entities = SoapService.select_node(doc,'cws6:BusinessEntity')
+      business_entities.collect do |business_entity|
+        attributes = {}
+        business_entity.children.each do |attrib|
+          attributes.merge!(attrib.name => attrib.text)
+        end
+        attributes
+      end
+    end  
     
     def get_current_user
       doc = request('WhoAmIRequest')
-      SoapService.select_node_text(doc,'cws:UserId')
+      SoapService.select_node_text(doc,'cws7:UserId')
     end
-    
-    def get_current_user_full_name(user_id)
-      doc = retrieve('systemuser',user_id,['fullname'])
-      SoapService.select_node_text(doc,'cws:fullname')   
-    end  
-    
+        
     private
     def get_action(name)
       "http://schemas.microsoft.com/crm/2007/WebServices/#{name}"
+    end
+    
+    def get_columns(attributes)
+      columns = attributes.collect { |attrib| "<q1:Attribute>#{attrib}</q1:Attribute>" }
+      columns.to_s
     end
   end
 end

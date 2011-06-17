@@ -11,18 +11,14 @@ module MSDynamics
       policy = "MBI_SSL"
       # open information about CRM Online
       partner = "crm.dynamics.com";
-
       # Get authorization endpoint  
       authorization_endpoint = self._get_authorization_endpoint
-
       # Do the following once per machine.  
       # Register each machine that you need to authenticate with.
       self._register_machine(device_name,device_password,client_id)
-    
       # Get device token based for the registered machine
       device_token = self._get_device_token(authorization_endpoint,device_name,device_password)
-
-      #Get WLID Ticket for the user
+      # Get WLID Ticket for the user
       self._get_ticket(authorization_endpoint,user_name,password,partner,policy,client_id,device_token)
     end
   

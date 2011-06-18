@@ -59,9 +59,41 @@ module MSDynamics
         business_entity.children.each do |attrib|
           attributes.merge!(attrib.name => attrib.text)
         end
-        attributes
+        clean_attributes(entity_name,attributes)
       end
     end  
+    
+    
+    def create(entity_name,params)
+      message = SoapService.compose_message(@message_header,
+        "<Create xmlns='http://schemas.microsoft.com/crm/2007/WebServices'> 
+          <entity xsi:type='#{entity_name}'>
+            #{get_params(params)} 
+          </entity> 
+        </Create>")
+      doc = SoapService.send_request(@crm_service_url,message,get_action('Create'))
+      SoapService.select_node_text(doc,'cws7:CreateResult')        
+    end
+    
+    def update(entity_name,entity_id,params)
+      message = SoapService.compose_message(@message_header,
+        "<Update xmlns='http://schemas.microsoft.com/crm/2007/WebServices'>
+          <entity xsi:type='#{entity_name}'>
+            #{get_params(params)}
+            <#{entity_name}id>#{entity_id}</#{entity_name}id> 
+          </entity> 
+        </Update>")
+      SoapService.send_request(@crm_service_url,message,get_action('Update'))
+    end
+      
+    def delete(entity_name,entity_id)
+      message = SoapService.compose_message(@message_header,
+        "<Delete xmlns='http://schemas.microsoft.com/crm/2007/WebServices'> 
+          <entityName>#{entity_name}</entityName> 
+          <id>#{entity_id}</id> 
+         </Delete>") 
+       SoapService.send_request(@crm_service_url,message,get_action('Delete'))
+    end
     
     def get_current_user
       doc = request('WhoAmIRequest')
@@ -76,6 +108,18 @@ module MSDynamics
     def get_columns(attributes)
       columns = attributes.collect { |attrib| "<q1:Attribute>#{attrib}</q1:Attribute>" }
       columns.to_s
+    end
+    
+    def get_params(params)
+      res = params.collect { |name,value| "<#{name}>#{value}</#{name}>" }
+      res.to_s
+    end
+    
+    def clean_attributes(entity_name,attributes)
+      name = "#{entity_name}id"
+      id = attributes[name]
+      attributes[name] = id[1..-2] if id
+      attributes
     end
   end
 end

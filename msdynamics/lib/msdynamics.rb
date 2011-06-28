@@ -1,0 +1,10 @@
+require 'rubygems'
+require 'uuidtools'
+require 'rest-client'
+require 'nokogiri'
+require 'date'
+
+require 'msdynamics/soap_service'
+require 'msdynamics/wlid_service'
+require 'msdynamics/discovery_service'
+require 'msdynamics/crm_service'

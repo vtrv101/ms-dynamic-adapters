@@ -1,1 +1,4 @@
 .DS_Store
+msdynamics/coverage
+msdynamics/Gemfile.lock
+msdynamics/spec/credentials

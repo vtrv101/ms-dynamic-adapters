@@ -31,6 +31,13 @@ end
 
 shared_examples_for "SpecHelper" do
   include Rhosync::TestMethods
+
+  before(:all) do
+    credentials = File.open('spec/credentials').gets
+    @test_user,@test_password = credentials ? credentials.split(',') : ['','']
+    puts "Specify test user before running these specs" unless @test_user.length > 0
+    puts "Specify test user password before running these specs" unless @test_password.length > 0
+  end
   
   before(:each) do
     Store.db.flushdb

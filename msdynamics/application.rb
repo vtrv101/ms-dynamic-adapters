@@ -1,7 +1,28 @@
+require 'lib/msdynamics'
+
 class Application < Rhosync::Base
   class << self
     def authenticate(username,password,session)
-      true # do some interesting authentication here...
+      begin
+        # TODO: handle exceptions
+        # From time to time Win Live doesn't respond or returns 400 (Bad Request); 
+        # we probably should retry in such cases  
+        wlid_ticket, wlid_expires = 
+          MSDynamics::WlidService.get_ticket(username,password)
+        puts "wlid_ticket" + wlid_ticket
+        puts "wlid_expires" + wlid_expires.to_s
+        crm_service_url, crm_ticket, crm_ticket_expires, user_organization = 
+          MSDynamics::DiscoveryService.get_crm_ticket("rhomobileinc.crm.dynamics.com",wlid_ticket)
+        puts "crm_service_url: " + crm_service_url
+        puts "crm_ticket:" + crm_ticket
+        puts "crm_ticket_expires: " + crm_ticket_expires.to_s
+        puts "user_organization: " + user_organization
+        #Store.set_data("#{username}-")
+      rescue Exception => ex
+        warn "Can't authenticate user #{username}: " + ex.inspect
+        return false
+      end
+      true
     end
     
     # Add hooks for application startup here

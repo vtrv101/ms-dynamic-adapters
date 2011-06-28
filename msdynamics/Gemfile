@@ -1,0 +1,31 @@
+source 'http://rubygems.org'
+
+gem 'rhosync', '3.0.0'
+
+platforms :jruby do
+  gem 'jdbc-sqlite3', :require => false
+  gem 'dbi'
+  gem 'dbd-jdbc', :require => 'dbd/Jdbc'
+  gem 'jruby-openssl'
+  gem 'warbler'
+end
+
+platforms :ruby do
+  gem 'sqlite3'
+end
+
+group :development do
+  # By default to run application thin web server is used
+  gem 'thin', '1.2.11', :platforms => :ruby
+
+  # For jruby trinidad JRuby web server is used
+  gem 'trinidad',  :platforms => :jruby
+  # Alternative for jruby
+  # gem 'jetty-rackup',  :platforms => :jruby
+end
+
+group :test do
+  gem 'rack-test', '>= 0.5.3', :require => "rack/test"
+  gem 'rspec', '~> 2.6.0'
+  gem 'rcov', '>= 0.9.8'
+end

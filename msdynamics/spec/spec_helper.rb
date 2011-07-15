@@ -29,18 +29,32 @@ module RSpec
  end
 end
 
+$authenticated = false
+
 shared_examples_for "SpecHelper" do
   include Rhosync::TestMethods
 
   before(:all) do
-    credentials = File.open('spec/credentials').gets
-    @test_user,@test_password = credentials ? credentials.split(',') : ['','']
-    puts "Specify test user before running these specs" unless @test_user.length > 0
-    puts "Specify test user password before running these specs" unless @test_password.length > 0
+    unless $authenticated
+      Store.db.flushdb
+      credentials = File.open('spec/credentials').gets
+      @test_user,@test_password = credentials ? credentials.split(',') : ['','']
+      if @test_user.length > 0 and @test_password.length > 0
+        puts "Performing authentication with MS Dynamic CRM instance for the user [#{@test_user}]"
+        $authenticated = Application.authenticate(@test_user,@test_password,nil) 
+      else
+        puts "Specify test user before running these specs" unless @test_user.length > 0
+        puts "Specify test user password before running these specs" unless @test_password.length > 0
+      end
+    end
   end
   
   before(:each) do
+    # preserving auth info 
+    auth_info = Application.load_auth_info(@test_user)
     Store.db.flushdb
     Application.initializer(ROOT_PATH)
-  end  
+    # restoring auth info in the DB
+    Application.save_auth_info(@test_user,auth_info) unless auth_info.nil?
+  end
 end

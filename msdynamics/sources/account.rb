@@ -3,10 +3,6 @@ class Account < SourceAdapter
     super(source)
   end
  
-  def login
-    # TODO: Login to your data source here if necessary
-  end
- 
   def query(params=nil)
     # TODO: Query your backend data source and assign the records 
     # to a nested hash structure called @result. For example:
@@ -41,9 +37,5 @@ class Account < SourceAdapter
     # be sure to have a hash key and value for "object"
     # for now, we'll say that its OK to not have a delete operation
     # raise "Please provide some code to delete a single object in the backend application using the object_id"
-  end
- 
-  def logoff
-    # TODO: Logout from the data source if necessary
   end
 end
